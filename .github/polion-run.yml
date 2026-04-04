@@ -1,0 +1,38 @@
+name: Run Polion Runner
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: read
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run runner container
+        env:
+          POLION_TOKEN: ${{ secrets.POLION_TOKEN }}
+        run: |
+          docker run --rm \
+            -e POLION_TOKEN="$POLION_TOKEN" \
+            -e GITHUB_ACTIONS=true \
+            -e GITHUB_REPOSITORY="${{ github.repository }}" \
+            -e GITHUB_REF_NAME="${{ github.ref_name }}" \
+            -e GITHUB_SHA="${{ github.sha }}" \
+            -e GITHUB_HEAD_REF="${{ github.head_ref }}" \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            ghcr.io/polion-io/test-node-runner:latest
