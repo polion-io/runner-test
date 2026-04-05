@@ -20,7 +20,7 @@ paths:
       - write
    tags:
     - themes
-   description: Create a new theme
+   description: Create a new theme for ws
    operationId: createTheme
    requestBody:
     content:
@@ -538,6 +538,8 @@ components:
     cssFile:
      type: string
     description:
+     type: string
+    target:
      type: string
     assetsUrl:
      type: string
