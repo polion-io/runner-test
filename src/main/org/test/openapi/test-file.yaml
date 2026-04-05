@@ -12,7 +12,7 @@ tags:
  - name: imagesInternal
    description: Managing Theme related Images like Favicons and Logos
 paths:
- /themes:
+ /theme:
   post:
    x-onecx:
     permissions:
