@@ -1,0 +1,809 @@
+---
+openapi: 3.0.3
+info:
+ title: onecx-theme-bff
+ description: Backend-For-Frontend (BFF) service for onecx-theme. This API provides endpoints to manage Themes and related Images
+ version: '1.0'
+servers:
+ - url: http://onecx-theme-bff:8080/
+tags:
+ - name: themes
+   description: Managing Themes
+ - name: imagesInternal
+   description: Managing Theme related Images like Favicons and Logos
+paths:
+ /themes:
+  post:
+   x-onecx:
+    permissions:
+     themes:
+      - write
+   tags:
+    - themes
+   description: Create a new theme
+   operationId: createTheme
+   requestBody:
+    content:
+     application/json:
+      schema:
+       $ref: '#/components/schemas/CreateThemeRequest'
+   responses:
+    "201":
+     description: Theme created successfully
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/CreateThemeResponse'
+    "400":
+     description: Bad Request
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ProblemDetailResponse'
+ /themes/{id}:
+  get:
+   x-onecx:
+    permissions:
+     themes:
+      - read
+   tags:
+    - themes
+   description: Get a theme by its id
+   operationId: getThemeById
+   parameters:
+    - $ref: '#/components/parameters/id'
+   responses:
+    "200":
+     description: Theme retrieved successfully
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/GetThemeResponse'
+    "400":
+     description: Bad request
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ProblemDetailResponse'
+    "404":
+     description: Theme not found
+  put:
+   x-onecx:
+    permissions:
+     themes:
+      - write
+   tags:
+    - themes
+   description: Update a theme by its id
+   operationId: updateTheme
+   parameters:
+    - $ref: '#/components/parameters/id'
+   requestBody:
+    content:
+     application/json:
+      schema:
+       $ref: '#/components/schemas/UpdateThemeRequest'
+   responses:
+    "200":
+     description: Theme updated successfully
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/UpdateThemeResponse'
+    "204":
+     description: No Content
+    "400":
+     description: Bad Request
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ProblemDetailResponse'
+    "404":
+     description: Theme not found
+  delete:
+   x-onecx:
+    permissions:
+     themes:
+      - delete
+   tags:
+    - themes
+   description: Delete a theme by its id
+   operationId: deleteTheme
+   parameters:
+    - $ref: '#/components/parameters/id'
+   responses:
+    "204":
+     description: Theme deleted successfully
+    "400":
+     description: Bad Request
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ProblemDetailResponse'
+ /themes/name/{name}:
+  get:
+   x-onecx:
+    permissions:
+     themes:
+      - read
+   tags:
+    - themes
+   description: Get a theme by its name
+   operationId: getThemeByName
+   parameters:
+    - $ref: '#/components/parameters/name'
+   responses:
+    "200":
+     description: Theme retrieved successfully
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/GetThemeResponse'
+    "400":
+     description: Bad request
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ProblemDetailResponse'
+    "404":
+     description: Theme not found
+ /themes/search:
+  post:
+   x-onecx:
+    permissions:
+     themes:
+      - read
+   tags:
+    - themes
+   description: Search themes by search criteria
+   operationId: searchThemes
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: '#/components/schemas/SearchThemeRequest'
+   responses:
+    "200":
+     description: Theme search results retrieved successfully
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/SearchThemeResponse'
+    "400":
+     description: Bad Request
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ProblemDetailResponse'
+ /themes/export:
+  post:
+   x-onecx:
+    permissions:
+     themes:
+      - read
+   tags:
+    - themes
+   description: Export a list of themes
+   operationId: exportThemes
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: '#/components/schemas/ExportThemeRequest'
+   responses:
+    "200":
+     description: Themes exported successfully
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ThemeSnapshot'
+    "404":
+     description: Themes not found
+ /themes/import:
+  post:
+   x-onecx:
+    permissions:
+     themes:
+      - write
+   tags:
+    - themes
+   description: Import a list of themes
+   operationId: importThemes
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: '#/components/schemas/ThemeSnapshot'
+   responses:
+    "200":
+     description: Themes imported successfully
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ImportThemeResponse'
+    "400":
+     description: Bad request
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ProblemDetailResponse'
+ /images/{refId}/{refType}:
+  get:
+   x-onecx:
+    permissions:
+     themes:
+      - read
+   tags:
+    - imagesInternal
+   description: Get an image by its reference id and type
+   operationId: getImage
+   parameters:
+    - name: refId
+      in: path
+      required: true
+      schema:
+       type: string
+    - name: refType
+      in: path
+      required: true
+      schema:
+       type: string
+   responses:
+    "200":
+     description: Image retrieved successfully
+     content:
+      image/*:
+       schema:
+        type: string
+        format: binary
+    "400":
+     description: Bad request
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ProblemDetailResponse'
+  post:
+   x-onecx:
+    permissions:
+     themes:
+      - write
+   tags:
+    - imagesInternal
+   description: Upload an image by its reference id and type
+   parameters:
+    - name: mimeType
+      in: header
+      required: true
+      schema:
+       $ref: "#/components/schemas/MimeType"
+    - name: refId
+      in: path
+      required: true
+      schema:
+       type: string
+    - name: refType
+      in: path
+      required: true
+      schema:
+       type: string
+   operationId: uploadImage
+   requestBody:
+    required: true
+    content:
+     image/*:
+      schema:
+       type: string
+       format: binary
+   responses:
+    "201":
+     description: Image uploaded successfully
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ImageInfo'
+    "400":
+     description: Bad Request
+  delete:
+   x-onecx:
+    permissions:
+     themes:
+      - delete
+   tags:
+    - imagesInternal
+   description: Delete an image by its reference id and type
+   operationId: deleteImage
+   parameters:
+    - name: refId
+      in: path
+      required: true
+      schema:
+       type: string
+    - name: refType
+      in: path
+      required: true
+      schema:
+       type: string
+   responses:
+    "204":
+     description: Image deleted successfully
+ /images/{refId}/availableTypes:
+  get:
+   x-onecx:
+    permissions:
+     themes:
+      - read
+   tags:
+    - imagesInternal
+   description: Get available image types
+   operationId: getAvailableImageTypes
+   parameters:
+    - name: refId
+      in: path
+      required: true
+      schema:
+       type: string
+   responses:
+    "200":
+     description: Available image types retrieved successfully
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/AvailableImageTypes'
+ /icons/{refId}:
+  post:
+   x-onecx:
+    permissions:
+     themes:
+      - read
+   tags:
+    - iconsInternal
+   description: Retrieve icons by list of names and refId
+   parameters:
+    - name: refId
+      in: path
+      required: true
+      schema:
+       type: string
+   operationId: findIconsByNamesAndRefId
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: '#/components/schemas/IconCriteria'
+   responses:
+    "200":
+     description: Icons retrieved successfully
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/IconListResponse'
+    "400":
+     description: Bad Request
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ProblemDetailResponse'
+ /icons/{refId}/upload:
+  post:
+   x-onecx:
+    permissions:
+     themes:
+      - read
+   tags:
+    - iconsInternal
+   description: Upload an icon set by its reference id
+   parameters:
+    - name: refId
+      in: path
+      required: true
+      schema:
+       type: string
+   operationId: uploadIconSet
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       type: string
+       format: binary
+   responses:
+    "201":
+     description: Icon uploaded successfully
+    "400":
+     description: Bad Request
+     content:
+      application/json:
+       schema:
+        $ref: '#/components/schemas/ProblemDetailResponse'
+components:
+ schemas:
+  RefType:
+   type: string
+   enum: [ logo, logo-small, favicon ]
+  MimeType:
+   type: string
+   enum: [ "image/x-icon", "image/svg+xml", "image/png", "image/jpg", "image/jpeg" ]
+  AvailableImageTypes:
+   type: object
+   properties:
+    types:
+     type: array
+     items:
+      type: string
+  IconCriteria:
+   type: object
+   required:
+    - names
+   properties:
+    names:
+     type: array
+     minItems: 1
+     items:
+      type: string
+  IconListResponse:
+   type: object
+   properties:
+    icons:
+     type: array
+     items:
+      $ref: '#/components/schemas/Icon'
+  Icon:
+   type: object
+   required:
+    - name
+    - type
+    - body
+   properties:
+    name:
+     type: string
+    type:
+     type: string
+    body:
+     type: string
+    parent:
+     type: string
+  Theme:
+   type: object
+   properties:
+    modificationCount:
+     format: int32
+     type: integer
+    creationDate:
+     $ref: '#/components/schemas/OffsetDateTime'
+    creationUser:
+     type: string
+    modificationDate:
+     $ref: '#/components/schemas/OffsetDateTime'
+    modificationUser:
+     type: string
+    id:
+     type: string
+    name:
+     minLength: 2
+     type: string
+    displayName:
+     minLength: 2
+     type: string
+    cssFile:
+     type: string
+    description:
+     type: string
+    assetsUrl:
+     type: string
+    logoUrl:
+     type: string
+    smallLogoUrl:
+     type: string
+    faviconUrl:
+     type: string
+    previewImageUrl:
+     type: string
+    assetsUpdateDate:
+     type: string
+    properties:
+     type: object
+    overrides:
+     type: array
+     items:
+      $ref: '#/components/schemas/ThemeOverride'
+    operator:
+     type: boolean
+    mandatory:
+     type: boolean
+     default: false
+  ThemeUpdateCreate:
+   type: object
+   properties:
+    modificationCount:
+     format: int32
+     type: integer
+    creationDate:
+     $ref: '#/components/schemas/OffsetDateTime'
+    creationUser:
+     type: string
+    modificationDate:
+     $ref: '#/components/schemas/OffsetDateTime'
+    modificationUser:
+     type: string
+    name:
+     minLength: 2
+     type: string
+    displayName:
+     minLength: 2
+     type: string
+    cssFile:
+     type: string
+    description:
+     type: string
+    assetsUrl:
+     type: string
+    logoUrl:
+     type: string
+    smallLogoUrl:
+     type: string
+    faviconUrl:
+     type: string
+    previewImageUrl:
+     type: string
+    assetsUpdateDate:
+     type: string
+    properties:
+     type: object
+    overrides:
+     type: array
+     items:
+      $ref: '#/components/schemas/ThemeOverride'
+    mandatory:
+     type: boolean
+     default: false
+  GetThemeResponse:
+   required:
+    - resource
+   type: object
+   properties:
+    resource:
+     $ref: '#/components/schemas/Theme'
+  GetThemesResponse:
+   allOf: # Combines the PagingResponse and the Resources
+    - $ref: '#/components/schemas/PagingResponse'
+    - type: object
+      properties:
+       stream:
+        type: array
+        items:
+         $ref: '#/components/schemas/Theme'
+  CreateThemeResponse:
+   required:
+    - resource
+   type: object
+   properties:
+    resource:
+     $ref: '#/components/schemas/Theme'
+  UpdateThemeResponse:
+   required:
+    - resource
+   type: object
+   properties:
+    resource:
+     $ref: '#/components/schemas/Theme'
+  OffsetDateTime:
+   format: date-time
+   type: string
+   example: 2022-03-10T12:15:50-04:00
+  ProblemDetailResponse:
+   type: object
+   properties:
+    errorCode:
+     type: string
+    detail:
+     type: string
+    params:
+     type: array
+     items:
+      $ref: '#/components/schemas/ProblemDetailParam'
+    invalidParams:
+     type: array
+     items:
+      $ref: '#/components/schemas/ProblemDetailInvalidParam'
+  ProblemDetailParam:
+   type: object
+   properties:
+    key:
+     type: string
+    value:
+     type: string
+  ProblemDetailInvalidParam:
+   type: object
+   properties:
+    name:
+     type: string
+    message:
+     type: string
+  CreateThemeRequest:
+   required:
+    - resource
+   type: object
+   properties:
+    resource:
+     $ref: '#/components/schemas/ThemeUpdateCreate'
+  UpdateThemeRequest:
+   required:
+    - resource
+   type: object
+   properties:
+    resource:
+     $ref: '#/components/schemas/ThemeUpdateCreate'
+  SearchThemeRequest:
+   type: object
+   properties:
+    name:
+     type: string
+    displayName:
+     type: string
+    pageNumber:
+     type: integer
+     format: int32
+     default: 0
+    pageSize:
+     type: integer
+     format: int32
+     default: 100
+     maximum: 1000
+  SearchThemeResponse:
+   allOf:
+    - $ref: '#/components/schemas/PagingResponse'
+    - type: object
+      properties:
+       stream:
+        type: array
+        items:
+         $ref: '#/components/schemas/Theme'
+  PagingResponse:
+   type: object
+   properties:
+    totalElements:
+     format: int64
+     type: integer
+    number:
+     format: int32
+     type: integer
+    size:
+     format: int32
+     type: integer
+    totalPages:
+     format: int64
+     type: integer
+  ExportThemeRequest:
+   type: object
+   properties:
+    names:
+     type: array
+     uniqueItems: true
+     items:
+      type: string
+  ThemeSnapshot:
+   type: object
+   properties:
+    id:
+     type: string
+     minLength: 10
+     description: ID of the request
+    created:
+     $ref: '#/components/schemas/OffsetDateTime'
+    themes:
+     type: object
+     nullable: false
+     additionalProperties:
+      $ref: '#/components/schemas/EximTheme'
+  ImportThemeResponse:
+   type: object
+   properties:
+    id:
+     type: string
+     minLength: 10
+     description: ID of the request
+    themes:
+     additionalProperties:
+      $ref: '#/components/schemas/ImportThemeResponseStatus'
+  ImportThemeResponseStatus:
+   type: string
+   enum:
+    - UPDATE
+    - CREATED
+    - SKIP
+  EximTheme:
+   type: object
+   properties:
+    displayName:
+     type: string
+    cssFile:
+     type: string
+    description:
+     type: string
+    assetsUrl:
+     type: string
+    logoUrl:
+     type: string
+    smallLogoUrl:
+     type: string
+    faviconUrl:
+     type: string
+    previewImageUrl:
+     type: string
+    assetsUpdateDate:
+     type: string
+    properties:
+     type: object
+    overrides:
+     type: array
+     items:
+      $ref: '#/components/schemas/ThemeOverride'
+    images:
+     $ref: '#/components/schemas/Images'
+    mandatory:
+     type: boolean
+     default: false
+  ThemeOverride:
+   type: object
+   properties:
+    type:
+     $ref: '#/components/schemas/OverrideType'
+    value:
+     type: string
+  OverrideType:
+   type: string
+   enum:
+    - PRIMENG
+    - CSS
+  Images:
+   type: object
+   nullable: false
+   additionalProperties:
+    $ref: '#/components/schemas/Image'
+  Image:
+   type: object
+   properties:
+    imageData:
+     type: string
+     format: byte
+    mimeType:
+     type: string
+  ImageInfo:
+   type: object
+   properties:
+    id:
+     type: string
+ parameters:
+  pageNumber:
+   in: query
+   name: pageNumber
+   required: false
+   schema:
+    type: integer
+    format: int32
+    default: 0
+  pageSize:
+   in: query
+   name: pageSize
+   required: false
+   schema:
+    type: integer
+    format: int32
+    default: 100
+    maximum: 1000
+  id:
+   in: path
+   name: id
+   required: true
+   schema:
+    type: string
+  name:
+   in: path
+   name: name
+   required: true
+   schema:
+    type: string
